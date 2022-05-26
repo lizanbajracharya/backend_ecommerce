@@ -2,7 +2,8 @@
 import Product from "../models/productModel.js";
 import mongoose from "mongoose";
 // use the new name of the database
-const url = "mongodb://localhost:27017/tst";
+const url =
+  "mongodb+srv://lizan:lizan123@cluster0.1qjl1.mongodb.net/?retryWrites=true&w=majority";
 beforeAll(async () => {
   await mongoose.connect(url, {
     useNewUrlParser: true,
@@ -12,6 +13,8 @@ beforeAll(async () => {
 afterAll(async () => {
   await mongoose.connection.close();
 });
+
+var productid = "";
 
 describe("Product Add", () => {
   // the code below is for insert testing
@@ -30,7 +33,14 @@ describe("Product Add", () => {
     };
 
     return Product.create(product).then((pro_ret) => {
+      productid = pro_ret._id;
       expect(pro_ret.name).toEqual("Nokia");
+    });
+  });
+
+  it("To get product by id", async () => {
+    return Product.findById({ _id: productid }).then((pp) => {
+      expect(pp.name).toEqual("Nokia");
     });
   });
 
@@ -54,16 +64,40 @@ describe("Product Add", () => {
   //   });
   // });
 
-  it("to test the update", async () => {
-    return Product.findByIdAndUpdate("620a5392b979f19e3871cc3e", {
+  it("To test the update", async () => {
+    return Product.findByIdAndUpdate(productid, {
       $set: { name: "ram" },
     }).then((pp) => {
-      expect(pp.name).toEqual("ram");
+      expect(pp.name).toEqual("Nokia");
     });
   });
 
-  it("to get all product", async () => {
+  it("To get all product", async () => {
     return Product.find().then((pp) => {
+      expect(pp.statusCode).toEqual(undefined);
+    });
+  });
+
+  it("To get product by color", async () => {
+    return Product.find({ color: "Red" }).then((pp) => {
+      expect(pp.statusCode).toEqual(undefined);
+    });
+  });
+
+  it("To get product by brand", async () => {
+    return Product.find({ brand: "Red" }).then((pp) => {
+      expect(pp.statusCode).toEqual(undefined);
+    });
+  });
+
+  it("To get product by name", async () => {
+    return Product.find({ name: "Red" }).then((pp) => {
+      expect(pp.statusCode).toEqual(undefined);
+    });
+  });
+
+  it("To get product by price", async () => {
+    return Product.find({ price: 12 }).then((pp) => {
       expect(pp.statusCode).toEqual(undefined);
     });
   });

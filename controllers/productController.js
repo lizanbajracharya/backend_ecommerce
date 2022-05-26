@@ -64,15 +64,9 @@ const getProductsByColor = asyncHandler(async (req, res) => {
 });
 
 const getProductsByPrice = asyncHandler(async (req, res) => {
-  const price = req.query.price
-    ? {
-        price: req.query.price,
-      }
-    : "";
+  const price = req.query.price;
 
-  const products = await Product.find({
-    ...price,
-  });
+  const products = await Product.find({ price: { $lte: price } });
 
   res.json({ products });
 });
@@ -95,7 +89,7 @@ const getProductsByBrand = asyncHandler(async (req, res) => {
 });
 
 const getProductsByAlphabetical = asyncHandler(async (req, res) => {
-  var mysort = { name: 1 };
+  var mysort = { name: req.query.alpha };
 
   const products = await Product.find().sort(mysort);
 
