@@ -80,6 +80,40 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc     Register a new admin
+// @route    POST api/users
+// @access   Private
+const registerAdmin = asyncHandler(async (req, res) => {
+  const { name, email, password, isAdmin } = req.body;
+
+  const userExists = await User.findOne({ email });
+
+  if (userExists) {
+    res.status(400);
+    throw new Error("User already Exists");
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    isAdmin,
+  });
+
+  if (user) {
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      token: generateToken(user._id),
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid user data");
+  }
+});
+
 // @desc     GET user profile
 // @route    GET api/users/profile
 // @access   Private
@@ -132,7 +166,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 const getUsers = asyncHandler(async (req, res) => {
   const users = await User.find({});
 
-  res.json(users);
+  res.json({ data: { data: users } });
 });
 
 // @desc     delete users
@@ -196,4 +230,5 @@ export {
   deleteUser,
   getUserById,
   updateUser,
+  registerAdmin,
 };

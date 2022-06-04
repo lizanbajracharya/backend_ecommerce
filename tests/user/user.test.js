@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 // etc.
 // use the new name of the database
 const url =
-  "mongodb+srv://lizan:lizan123@cluster0.1qjl1.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://ecommerce:ecommerce@cluster0.1qjl1.mongodb.net/?retryWrites=true&w=majority";
 beforeAll(async () => {
   await mongoose.connect(url, {
     useNewUrlParser: true,
@@ -30,6 +30,26 @@ describe("User Schema test anything", () => {
       name: "test",
       email: email,
       password: "123123123",
+    };
+
+    return User.create(user).then((pro_ret) => {
+      userid = pro_ret._id;
+      expect(pro_ret.name).toEqual("test");
+    });
+  });
+
+  it("Add admin testing anything", () => {
+    var chars = "abcdefghijklmnopqrstuvwxyz1234567890";
+    var string = "";
+    for (var ii = 0; ii < 15; ii++) {
+      string += chars[Math.floor(Math.random() * chars.length)];
+    }
+    var email = string + "@gmail.com";
+    const user = {
+      name: "test",
+      email: email,
+      password: "123123123",
+      isAdmin: true,
     };
 
     return User.create(user).then((pro_ret) => {

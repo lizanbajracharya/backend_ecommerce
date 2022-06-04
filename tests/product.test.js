@@ -3,7 +3,7 @@ import Product from "../models/productModel.js";
 import mongoose from "mongoose";
 // use the new name of the database
 const url =
-  "mongodb+srv://lizan:lizan123@cluster0.1qjl1.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://ecommerce:ecommerce@cluster0.1qjl1.mongodb.net/?retryWrites=true&w=majority";
 beforeAll(async () => {
   await mongoose.connect(url, {
     useNewUrlParser: true,
