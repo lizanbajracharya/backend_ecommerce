@@ -6,7 +6,9 @@ import colors from "colors";
 import morgan from "morgan";
 import userRoutes from "./routes/userRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import colorRoutes from "./routes/colorRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+import brandRoutes from "./routes/brandRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import cors from "cors";
 dotenv.config();
@@ -24,6 +26,8 @@ app.use(express.json());
 
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/colors", colorRoutes);
+app.use("/api/brands", brandRoutes);
 app.use("/api/upload", uploadRoutes);
 
 const __dirname = path.resolve();

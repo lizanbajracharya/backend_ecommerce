@@ -1,5 +1,9 @@
 // use the path of your model
 import Product from "../models/productModel.js";
+import Brand from "../models/brandModel.js";
+import Color from "../models/colorModel.js";
+import User from "../models/userModel.js";
+
 import mongoose from "mongoose";
 // use the new name of the database
 const url =
@@ -15,21 +19,53 @@ afterAll(async () => {
 });
 
 var productid = "";
+var brandId = "";
+var colorId = "";
 
 describe("Product Add", () => {
   // the code below is for insert testing
-  it("Add product testing", () => {
+  it("Add product testing", async () => {
+    const brand = {
+      name: "Nokia",
+      type: "all",
+    };
+
+    const brandData = await Brand.create(brand);
+    brandId = brandData?._id;
+
+    const color = {
+      name: "Black",
+      code: "#000000",
+    };
+
+    const colorData = await Color.create(color);
+    colorId = colorData?._id;
+
+    var chars = "abcdefghijklmnopqrstuvwxyz1234567890";
+    var string = "";
+    for (var ii = 0; ii < 15; ii++) {
+      string += chars[Math.floor(Math.random() * chars.length)];
+    }
+    var email = string + "@gmail.com";
+    const user = {
+      name: "test",
+      email: email,
+      password: "123123123",
+    };
+
+    const userData = await User.create(user);
+
     const product = {
       name: "Nokia",
       price: "21",
       countInStock: "1",
       description: "asd",
       category: "ad",
-      color: "test",
-      brand: "test",
+      color: colorData?._id,
+      brand: brandData?._id,
       image: "asd.jpg",
       numReviews: "0",
-      user: "620a2f821b86afdd7100e60e",
+      user: userData?._id,
     };
 
     return Product.create(product).then((pro_ret) => {
@@ -79,25 +115,25 @@ describe("Product Add", () => {
   });
 
   it("To get product by color", async () => {
-    return Product.find({ color: "Red" }).then((pp) => {
+    return Product.find({ color: colorId }).then((pp) => {
       expect(pp.statusCode).toEqual(undefined);
     });
   });
 
   it("To get product by brand", async () => {
-    return Product.find({ brand: "Red" }).then((pp) => {
+    return Product.find({ brand: brandId }).then((pp) => {
       expect(pp.statusCode).toEqual(undefined);
     });
   });
 
   it("To get product by name", async () => {
-    return Product.find({ name: "Red" }).then((pp) => {
+    return Product.find({ name: "Nokia" }).then((pp) => {
       expect(pp.statusCode).toEqual(undefined);
     });
   });
 
   it("To get product by price", async () => {
-    return Product.find({ price: 12 }).then((pp) => {
+    return Product.find({ price: 21 }).then((pp) => {
       expect(pp.statusCode).toEqual(undefined);
     });
   });

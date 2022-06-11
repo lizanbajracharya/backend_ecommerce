@@ -5,7 +5,6 @@ import Product from "../models/productModel.js";
 // @route   GET api/product
 // @access   Public
 const getProducts = asyncHandler(async (req, res) => {
-  console.log(req.query);
   const price = req.query.price
     ? {
         price: req.query.price,
@@ -41,24 +40,21 @@ const getProducts = asyncHandler(async (req, res) => {
     ...brand,
     ...color,
     ...price,
-  });
+  })
+    .populate("brand")
+    .populate("color");
 
   res.json({ products });
 });
 
 const getProductsByColor = asyncHandler(async (req, res) => {
-  const color = req.query.color
-    ? {
-        color: {
-          $regex: req.query.color,
-          $options: "i",
-        },
-      }
-    : "";
+  const color = req.query.color;
 
   const products = await Product.find({
     ...color,
-  });
+  })
+    .populate("brand")
+    .populate("color");
 
   res.json({ products });
 });
@@ -66,24 +62,21 @@ const getProductsByColor = asyncHandler(async (req, res) => {
 const getProductsByPrice = asyncHandler(async (req, res) => {
   const price = req.query.price;
 
-  const products = await Product.find({ price: { $lte: price } });
+  const products = await Product.find({ price: { $lte: price } })
+    .populate("brand")
+    .populate("color");
 
   res.json({ products });
 });
 
 const getProductsByBrand = asyncHandler(async (req, res) => {
-  const brand = req.query.brand
-    ? {
-        brand: {
-          $regex: req.query.brand,
-          $options: "i",
-        },
-      }
-    : "";
+  const brand = req.query.brand;
 
   const products = await Product.find({
     ...brand,
-  });
+  })
+    .populate("brand")
+    .populate("color");
 
   res.json({ products });
 });
@@ -91,7 +84,10 @@ const getProductsByBrand = asyncHandler(async (req, res) => {
 const getProductsByAlphabetical = asyncHandler(async (req, res) => {
   var mysort = { name: req.query.alpha };
 
-  const products = await Product.find().sort(mysort);
+  const products = await Product.find()
+    .sort(mysort)
+    .populate("brand")
+    .populate("color");
 
   res.json({ products });
 });
@@ -99,7 +95,10 @@ const getProductsByAlphabetical = asyncHandler(async (req, res) => {
 const getProductsByNewAndOld = asyncHandler(async (req, res) => {
   var mysort = { createdAt: req.query.asc };
 
-  const products = await Product.find().sort(mysort);
+  const products = await Product.find()
+    .sort(mysort)
+    .populate("brand")
+    .populate("color");
 
   res.json({ products });
 });
@@ -110,7 +109,10 @@ const getProductsByNewAndOld = asyncHandler(async (req, res) => {
 const getFeaturedProducts = asyncHandler(async (req, res) => {
   const pageSize = 3;
 
-  const products = await Product.find().limit(pageSize);
+  const products = await Product.find()
+    .limit(pageSize)
+    .populate("brand")
+    .populate("color");
 
   res.json({ products });
 });
@@ -119,11 +121,9 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
 // @route    GET api/product/:id
 // @access   Public
 const getProductById = asyncHandler(async (req, res) => {
-  const product = await Product.findById(req.params.id);
-  // .populate(
-  //   "category",
-  //   "name"
-  // );
+  const product = await Product.findById(req.params.id)
+    .populate("brand")
+    .populate("color");
 
   if (product) {
     res.json(product);
@@ -268,7 +268,11 @@ const createProductReview = asyncHandler(async (req, res) => {
 // @route    GET /api/products/top
 // @access   Public
 const getTopProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({}).sort({ rating: -1 }).limit(3);
+  const products = await Product.find({})
+    .sort({ rating: -1 })
+    .limit(3)
+    .populate("brand")
+    .populate("color");
 
   res.json(products);
 });

@@ -15,13 +15,17 @@ const productSchema = mongoose.Schema(
       type: String,
     },
     brand: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: "Brand",
     },
-    color: {
-      type: String,
-      required: true,
-    },
+    color: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Color",
+        required: true,
+      },
+    ],
     description: {
       type: String,
       required: true,
