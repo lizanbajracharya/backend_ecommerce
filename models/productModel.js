@@ -26,6 +26,14 @@ const productSchema = mongoose.Schema(
         required: true,
       },
     ],
+    wishList: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      },
+    ],
     description: {
       type: String,
       required: true,

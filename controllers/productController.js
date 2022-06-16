@@ -49,9 +49,9 @@ const getProducts = asyncHandler(async (req, res) => {
 
 const getProductsByColor = asyncHandler(async (req, res) => {
   const color = req.query.color;
-
+  console.log(color);
   const products = await Product.find({
-    ...color,
+    color,
   })
     .populate("brand")
     .populate("color");
@@ -71,9 +71,8 @@ const getProductsByPrice = asyncHandler(async (req, res) => {
 
 const getProductsByBrand = asyncHandler(async (req, res) => {
   const brand = req.query.brand;
-
   const products = await Product.find({
-    ...brand,
+    brand,
   })
     .populate("brand")
     .populate("color");
@@ -100,6 +99,16 @@ const getProductsByNewAndOld = asyncHandler(async (req, res) => {
     .populate("brand")
     .populate("color");
 
+  res.json({ products });
+});
+
+const getProductWishlisted = asyncHandler(async (req, res) => {
+  var wishList = req.user._id;
+  // console.log(wishList);
+  const products = await Product.find({ wishList: { user: wishList } })
+    .populate("brand")
+    .populate("color");
+  console.log(products);
   res.json({ products });
 });
 
@@ -201,7 +210,8 @@ const createProduct = asyncHandler(async (req, res) => {
 // @route    PUT api/products/:id
 // @access   Private/Admin
 const updateProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, image, category, countInStock } = req.body;
+  const { name, price, description, image, brand, countInStock, color } =
+    req.body;
 
   const product = await Product.findById(req.params.id);
 
@@ -210,9 +220,9 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.price = price;
     product.description = description;
     product.image = image;
-    product.category = category;
     product.countInStock = countInStock;
-
+    product.brand = brand;
+    product.color = color;
     const updatedProduct = await product.save();
     res.json(updatedProduct);
   } else {
@@ -227,7 +237,9 @@ const updateProduct = asyncHandler(async (req, res) => {
 const createProductReview = asyncHandler(async (req, res) => {
   const { rating, comment } = req.body;
 
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id)
+    .populate("brand")
+    .populate("color");
 
   if (product) {
     const alreadyReviewed = product.reviews.find(
@@ -264,6 +276,64 @@ const createProductReview = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc     Add product to wishlist
+// @route    POST /api/products/wishlist
+// @access   Public
+const getProductToWishList = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id)
+    .populate("brand")
+    .populate("color");
+  if (product) {
+    const alreadyAddedToWishlist = product.wishList.find(
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+
+    if (alreadyAddedToWishlist) {
+      res.status(400);
+      throw new Error("Product already added to wishlist");
+    }
+
+    const wishlist = {
+      user: req.user._id,
+    };
+
+    product.wishList.push(wishlist);
+
+    await product.save();
+    res.status(201).json({
+      message: "Product added to wishlist",
+    });
+  } else {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+});
+
+// @desc     Remove product to wishlist
+// @route    POST /api/products/remove
+// @access   Public
+const removeFromWishlist = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id)
+    .populate("brand")
+    .populate("color");
+
+  if (product) {
+    const alreadyAddedToWishlist = product.wishList.filter(
+      (r) => r.user.toString() === req.user._id.toString()
+    );
+    console.log(alreadyAddedToWishlist);
+    // product.wishList.push(alreadyAddedToWishlist);
+
+    await product.save();
+    res.status(201).json({
+      message: "Product removed from wishlist",
+    });
+  } else {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+});
+
 // @desc     Get top rated product
 // @route    GET /api/products/top
 // @access   Public
@@ -292,4 +362,7 @@ export {
   getProductsByPrice,
   getProductsByAlphabetical,
   getProductsByNewAndOld,
+  getProductToWishList,
+  getProductWishlisted,
+  removeFromWishlist,
 };
