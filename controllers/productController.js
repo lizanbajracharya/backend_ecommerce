@@ -49,7 +49,6 @@ const getProducts = asyncHandler(async (req, res) => {
 
 const getProductsByColor = asyncHandler(async (req, res) => {
   const color = req.query.color;
-  console.log(color);
   const products = await Product.find({
     color,
   })
@@ -277,7 +276,7 @@ const createProductReview = asyncHandler(async (req, res) => {
 });
 
 // @desc     Add product to wishlist
-// @route    POST /api/products/wishlist
+// @route    POST /api/products/:id/wishlist
 // @access   Public
 const getProductToWishList = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id)
@@ -285,7 +284,7 @@ const getProductToWishList = asyncHandler(async (req, res) => {
     .populate("color");
   if (product) {
     const alreadyAddedToWishlist = product.wishList.find(
-      (r) => r.user.toString() === req.user._id.toString()
+      (r) => r.toString() === req.user._id.toString()
     );
 
     if (alreadyAddedToWishlist) {
@@ -293,9 +292,7 @@ const getProductToWishList = asyncHandler(async (req, res) => {
       throw new Error("Product already added to wishlist");
     }
 
-    const wishlist = {
-      user: req.user._id,
-    };
+    const wishlist = req.user._id;
 
     product.wishList.push(wishlist);
 
@@ -310,7 +307,7 @@ const getProductToWishList = asyncHandler(async (req, res) => {
 });
 
 // @desc     Remove product to wishlist
-// @route    POST /api/products/remove
+// @route    POST /api/products/:id/remove
 // @access   Public
 const removeFromWishlist = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id)
@@ -318,12 +315,8 @@ const removeFromWishlist = asyncHandler(async (req, res) => {
     .populate("color");
 
   if (product) {
-    const alreadyAddedToWishlist = product.wishList.filter(
-      (r) => r.user.toString() === req.user._id.toString()
-    );
-    console.log(alreadyAddedToWishlist);
-    // product.wishList.push(alreadyAddedToWishlist);
-
+    let index = product.wishList.indexOf(req.user._id);
+    product.wishList.splice(index, 1);
     await product.save();
     res.status(201).json({
       message: "Product removed from wishlist",
@@ -332,6 +325,19 @@ const removeFromWishlist = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("Product not found");
   }
+});
+
+// @desc     Get product by wishlisted user
+// @route    GET /api/products/wishlist
+// @access   Public
+const getWishlistedProductOfUser = asyncHandler(async (req, res) => {
+  let wishList = req.user._id;
+  console.log(wishList);
+  const products = await Product.find({ wishList })
+    .populate("brand")
+    .populate("color");
+
+  res.json({ products });
 });
 
 // @desc     Get top rated product
@@ -365,4 +371,5 @@ export {
   getProductToWishList,
   getProductWishlisted,
   removeFromWishlist,
+  getWishlistedProductOfUser,
 };

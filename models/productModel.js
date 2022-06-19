@@ -28,10 +28,8 @@ const productSchema = mongoose.Schema(
     ],
     wishList: [
       {
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
       },
     ],
     description: {
