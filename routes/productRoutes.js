@@ -18,7 +18,9 @@ import {
   getProductToWishList,
   getProductWishlisted,
   removeFromWishlist,
+  updateProductReview,
   getWishlistedProductOfUser,
+  deleteProductReview,
 } from "../controllers/productController.js";
 import { protect, admin } from "../middleware/authMiddleware.js";
 
@@ -29,7 +31,11 @@ router.route("/branded").get(getProductsByBrand);
 router.route("/priced").get(getProductsByPrice);
 router.route("/sorted").get(getProductsByAlphabetical);
 router.route("/filter").get(getProductsByNewAndOld);
-router.route("/:id/reviews").post(protect, createProductReview);
+router
+  .route("/:id/reviews")
+  .post(protect, createProductReview)
+  .put(protect, updateProductReview)
+  .delete(protect, deleteProductReview);
 router.route("/:id/wishlist").post(protect, getProductToWishList);
 router.route("/:id/remove").post(protect, removeFromWishlist);
 router.get("/top", getTopProducts);

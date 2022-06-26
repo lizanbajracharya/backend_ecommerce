@@ -275,6 +275,79 @@ const createProductReview = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc     update review
+// @route    PUT api/products/:id/review
+// @access   Private/Admin
+const updateProductReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body;
+
+  const product = await Product.findById(req.params.id)
+    .populate("brand")
+    .populate("color");
+
+  if (product) {
+    const alreadyReviewed = product.reviews.indexOf(
+      product.reviews.find((r) => r.user.toString() === req.user._id.toString())
+    );
+    product.reviews.splice(alreadyReviewed, 1);
+
+    const review = {
+      name: req.user.name,
+      rating: Number(rating),
+      comment,
+      user: req.user._id,
+    };
+
+    product.reviews.push(review);
+
+    product.numReviews = product.reviews.length;
+
+    product.rating =
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length;
+
+    await product.save();
+    res.status(201).json({
+      message: "Review Updated",
+    });
+  } else {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+});
+
+// @desc     delete review
+// @route    DELETE api/products/:id/review
+// @access   Private/Admin
+const deleteProductReview = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id)
+    .populate("brand")
+    .populate("color");
+
+  if (product) {
+    const alreadyReviewed = product.reviews.indexOf(
+      product.reviews.find((r) => r.user.toString() === req.user._id.toString())
+    );
+    product.reviews.splice(alreadyReviewed, 1);
+
+    product.numReviews = product.reviews.length;
+
+    product.rating =
+      product.reviews.length > 0
+        ? product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+          product.reviews.length
+        : 0;
+
+    await product.save();
+    res.status(201).json({
+      message: "Review Removed",
+    });
+  } else {
+    res.status(404);
+    throw new Error("Product not found");
+  }
+});
+
 // @desc     Add product to wishlist
 // @route    POST /api/products/:id/wishlist
 // @access   Public
@@ -372,4 +445,6 @@ export {
   getProductWishlisted,
   removeFromWishlist,
   getWishlistedProductOfUser,
+  updateProductReview,
+  deleteProductReview,
 };
