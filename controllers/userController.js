@@ -124,6 +124,11 @@ const getUserProfile = asyncHandler(async (req, res) => {
     res.json({
       _id: user._id,
       name: user.name,
+      city: user.city,
+      phone: user.phone,
+      country: user.country,
+      address: user.address,
+      image: user.image,
       email: user.email,
       isAdmin: user.isAdmin,
     });
@@ -142,6 +147,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   if (user) {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
+    user.phone = req.body.phone || user.phone;
+    user.address = req.body.address || user.address;
+    user.country = req.body.country || user.country;
+    user.city = req.body.city || user.city;
+    user.image = req.body.image || user.image;
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -151,6 +161,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
+      country: updatedUser.country,
+      city: updatedUser.city,
+      address: updatedUser.address,
+      phone: updatedUser.phone,
+      image: updatedUser.image,
       isAdmin: updatedUser.isAdmin,
       token: generateToken(updatedUser._id),
     });

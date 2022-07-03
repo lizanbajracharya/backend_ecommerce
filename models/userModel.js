@@ -7,6 +7,21 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    phone: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    image: {
+      type: String,
+    },
     email: {
       type: String,
       required: true,
